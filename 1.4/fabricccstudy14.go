@@ -83,7 +83,7 @@ func (t *fabriccc) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	}else if a_parm == "get"{   //取单个值
 
-		var keyvalue []byte
+		/*var keyvalue []byte
 		var err error
 		keyvalue,err = stub.GetState(b_parm)
 
@@ -92,9 +92,10 @@ func (t *fabriccc) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 			return shim.Error(" finad error! ")
 		}
 
+		return shim.Success( keyvalue )*/
 
-		return shim.Success( keyvalue )
 
+		return t.query(stub, args)
 
 
 	}else if a_parm == "CreateCompositeKeyandset" { // 设置一个复合键的值
@@ -399,8 +400,29 @@ func (t *fabriccc) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	}
 
-
 }
+
+
+// query callback representing the query of a chaincode
+func (t *fabriccc) query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
+
+
+	var b_parm = args[1]
+
+	var keyvalue []byte
+	var err error
+	keyvalue,err = stub.GetState(b_parm)
+
+	if( err != nil  ){
+
+		return shim.Error(" finad error! ")
+	}
+
+
+	return shim.Success( keyvalue )
+}
+
 
 
 func main() {
