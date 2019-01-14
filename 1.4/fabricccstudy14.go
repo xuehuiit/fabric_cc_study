@@ -195,8 +195,24 @@ func (t *fabriccc) invoke(stub shim.ChaincodeStubInterface, args []string) pb.Re
 }
 
 
+func (t *fabriccc) Query( stub shim.ChaincodeStubInterface) pb.Response {
+
+
+	_,args := stub.GetFunctionAndParameters()
+
+	var a_parm= args[0]
+	var b_parm= args[1]
+	var c_parm= args[2]
+
+	fmt.Println("  ========  curr method big  query  ========== ")
+
+	fmt.Printf(" parm is  %s  %s  %s   \n ", a_parm, b_parm, c_parm)
+
+	return shim.Success( []byte("return for big query") );
+}
+
 // test query method
-func (t *fabriccc) query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (t *fabriccc) query( stub shim.ChaincodeStubInterface , args []string) pb.Response {
 
 
 
@@ -205,7 +221,7 @@ func (t *fabriccc) query(stub shim.ChaincodeStubInterface, args []string) pb.Res
 	var c_parm = args[2]
 
 
-	fmt.Println("  ========  curr method is query  ========== ")
+	fmt.Println("  ========  curr method is small query  ========== ")
 
 	fmt.Printf(" parm is  %s  %s  %s   \n " , a_parm , b_parm , c_parm )
 
