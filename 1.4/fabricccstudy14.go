@@ -27,7 +27,7 @@ type fabriccc struct {
 
 }
 
-/** 
+/**
 
 	系统初始化方法， 在部署chaincode的过程中当执行命令
 
@@ -106,7 +106,17 @@ func (t *fabriccc) invoke(stub shim.ChaincodeStubInterface, args []string) pb.Re
 
 	}else if a_parm == "get"{   //取单个值
 
-		return t.query(stub, args)
+		var keyvalue []byte
+		var err error
+		keyvalue,err = stub.GetState(b_parm)
+
+		if( err != nil  ){
+
+			return shim.Error(" finad error! ")
+		}
+
+
+		return shim.Success( keyvalue )
 
 
 	}else if a_parm == "delete" { //删除某个值
@@ -208,7 +218,17 @@ func (t *fabriccc) query(stub shim.ChaincodeStubInterface, args []string) pb.Res
 
 	}else if a_parm == "get"{   //取单个值
 
-		return t.query(stub, args)
+		var keyvalue []byte
+		var err error
+		keyvalue,err = stub.GetState(b_parm)
+
+		if( err != nil  ){
+
+			return shim.Error(" finad error! ")
+		}
+
+
+		return shim.Success( keyvalue )
 
 
 	}else if a_parm == "delete" { //删除某个值
