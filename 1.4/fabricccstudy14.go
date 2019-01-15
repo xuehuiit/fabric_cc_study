@@ -19,7 +19,7 @@ import (
 	//"github.com/hyperledger/fabric/common/util"
 	"encoding/json"
 	//"strings"
-	"time"
+	//"time"
 )
 
 //定义一个机构体，作为chaincode的主对象，可以是任何符合go语言规范的命名方式
@@ -74,12 +74,153 @@ func (t *fabriccc) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.invoke(stub, args)
 	} else if function == "query" {
 		return t.query(stub, args)
+	}else if function == "get" {
+		return t.get(stub, args)
+	}else if function == "set" {
+		return t.set(stub, args)
+	}else if function == "delete" {
+		return t.delete(stub, args)
+	}else if function == "GetHistoryForKey" {
+		return t.GetHistoryForKey(stub, args)
 	}
 
 	return shim.Error("Invalid invoke function name. Expecting \"invoke\" \"query\"")
 
 
 }
+
+
+
+// test set method
+func (t *fabriccc) set(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
+
+
+	var a_parm = args[0]
+	var b_parm = args[1]
+	var c_parm = args[2]
+
+
+	fmt.Println("  ========  curr method is set   ========== ")
+
+	fmt.Printf(" parm is  %s  %s  %s  \n " , a_parm , b_parm , c_parm )
+
+	stub.PutState(b_parm,[]byte(c_parm))
+	return shim.Success( []byte( "success invok " + c_parm  )  )
+
+
+}
+
+
+// test get method
+func (t *fabriccc) get(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
+
+	var a_parm = args[0]
+	var b_parm = args[1]
+	var c_parm = args[2]
+
+	fmt.Println("  ========  curr method is get   ========== ")
+	fmt.Printf(" parm is  %s  %s  %s   \n " , a_parm , b_parm , c_parm )
+
+	keyvalue,err := stub.GetState(b_parm)
+
+	if( err != nil  ){
+
+		return shim.Error(" finad error! ")
+	}
+
+
+	return shim.Success( keyvalue )
+
+
+
+}
+
+
+// test delete method
+func (t *fabriccc) delete(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
+
+	var a_parm = args[0]
+	var b_parm = args[1]
+	var c_parm = args[2]
+
+	fmt.Println("  ========  curr method is delete   ========== ")
+	fmt.Printf(" parm is  %s  %s  %s   \n " , a_parm , b_parm , c_parm )
+
+
+	err := stub.DelState(b_parm)
+
+	if err != nil {
+		return shim.Error(" 删除出现错误！！！！！")
+	}
+
+	return shim.Success([]byte(" 删除正确！！！！！  "))
+
+
+}
+
+
+
+// test GetHistoryForKey method
+func (t *fabriccc) GetHistoryForKey(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
+
+	var a_parm = args[0]
+	var b_parm = args[1]
+	var c_parm = args[2]
+
+	fmt.Println("  ========  curr method is GetHistoryForKey   ========== ")
+	fmt.Printf(" parm is  %s  %s  %s   \n " , a_parm , b_parm , c_parm )
+
+
+	keysIter, err := stub.GetHistoryForKey(b_parm);
+
+
+	if err != nil {
+		return shim.Error(fmt.Sprintf("GetHistoryForKey failed. Error accessing state: %s", err))
+	}
+	defer keysIter.Close()
+
+	var keys []string
+
+	for keysIter.HasNext() {
+
+		response, iterErr := keysIter.Next()
+		if iterErr != nil {
+			return shim.Error(fmt.Sprintf("GetHistoryForKey operation failed. Error accessing state: %s", err))
+		}
+
+		//交易编号
+		txid := response.TxId
+		//交易的值
+		txvalue := response.Value
+		//当前交易的状态
+		txstatus := response.IsDelete
+		//交易发生的时间戳
+
+		/*txtimesamp :=response.Timestamp
+		tm := time.Unix(txtimesamp.Seconds, 0)
+		datestr := tm.Format("2006-01-02 03:04:05 PM")
+*/
+
+		fmt.Printf(" Tx info -   txid : %s   value :  %s  if delete: %t   datetime : %s \n ", txid , string(txvalue) , txstatus , " " )
+
+		keys = append( keys , txid)
+
+	}
+
+
+	jsonKeys, err := json.Marshal(keys)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("query operation failed. Error marshaling JSON: %s", err))
+	}
+
+	return shim.Success(jsonKeys)
+
+}
+
 
 
 // test invoke method
@@ -159,13 +300,13 @@ func (t *fabriccc) invoke(stub shim.ChaincodeStubInterface, args []string) pb.Re
 			//当前交易的状态
 			txstatus := response.IsDelete
 			//交易发生的时间戳
-			txtimesamp :=response.Timestamp
 
+			/*txtimesamp :=response.Timestamp
 			tm := time.Unix(txtimesamp.Seconds, 0)
-			datestr := tm.Format("2006-01-02 03:04:05 PM")
+			datestr := tm.Format("2006-01-02 03:04:05 PM")*/
 
 
-			fmt.Printf(" Tx info -   txid : %s   value :  %s  if delete: %t   datetime : %s \n ", txid , string(txvalue) , txstatus , datestr )
+			fmt.Printf(" Tx info -   txid : %s   value :  %s  if delete: %t   datetime : %s \n ", txid , string(txvalue) , txstatus , "  " )
 
 			keys = append( keys , txid)
 
@@ -287,13 +428,13 @@ func (t *fabriccc) query( stub shim.ChaincodeStubInterface , args []string) pb.R
 			//当前交易的状态
 			txstatus := response.IsDelete
 			//交易发生的时间戳
-			txtimesamp :=response.Timestamp
+			//txtimesamp :=response.Timestamp
 
-			tm := time.Unix(txtimesamp.Seconds, 0)
-			datestr := tm.Format("2006-01-02 03:04:05 PM")
+			//tm := time.Unix(txtimesamp., 0)
+			//datestr := tm.Format("2006-01-02 03:04:05 PM")
 
 
-			fmt.Printf(" Tx info -   txid : %s   value :  %s  if delete: %t   datetime : %s \n ", txid , string(txvalue) , txstatus , datestr )
+			fmt.Printf(" Tx info -   txid : %s   value :  %s  if delete: %t   datetime : %s \n ", txid , string(txvalue) , txstatus , "d" )
 
 			keys = append( keys , txid)
 
