@@ -200,6 +200,11 @@ func (t *fabriccc) InvokeChaincode( stub shim.ChaincodeStubInterface , args []st
 		return shim.Error(errStr)
 	}
 
+	stub.PutState("1_"+c_parm2,[]byte(c_parm3))
+	stub.PutState("2_"+c_parm2,[]byte(c_parm3))
+	stub.PutState("3_"+c_parm2,[]byte(c_parm3))
+	stub.PutState("4_"+c_parm2,[]byte(c_parm3))
+
 
 	cow_result := string(cow_response.Payload)
 
