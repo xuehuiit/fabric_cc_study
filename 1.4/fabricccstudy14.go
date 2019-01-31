@@ -183,8 +183,9 @@ func (t *fabriccc) InvokeChaincode( stub shim.ChaincodeStubInterface , args []st
 	var c_parm_callmethod = args[2]
 	var c_parm1 = args[3]
 	var c_parm2 = args[4]
+	var c_parm3 = args[5]
 
-	cow_parms := []string{c_parm_callmethod,c_parm1,c_parm2,"a"}
+	cow_parms := []string{c_parm_callmethod,c_parm1,c_parm2,c_parm3}
 	queryArgs1 := make([][]byte, len(cow_parms))
 	for i, arg := range cow_parms {
 		queryArgs1[i] = []byte(arg)
