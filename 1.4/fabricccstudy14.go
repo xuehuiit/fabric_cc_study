@@ -204,7 +204,7 @@ func (t *fabriccc) InvokeChaincode( stub shim.ChaincodeStubInterface , args []st
 
 	fmt.Printf(" cow info -   result : %s   \n  ", cow_result )
 
-	return shim.Success([]byte("cow_result"))
+	return shim.Success([]byte(cow_result))
 
 
 }
