@@ -163,6 +163,9 @@ func (t *fabriccc) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 		return t.InvokeChaincode( stub ,args )
 
+	}else if function == "GetTxID" {
+		return t.getTxID(stub)
+
 	}
 
 
@@ -437,17 +440,7 @@ func (t *fabriccc) etTxTimestamp(stub shim.ChaincodeStubInterface, args []string
 
 
 // 获取当前的交易编号
-func (t *fabriccc) getTxID(stub shim.ChaincodeStubInterface , args []string) pb.Response {
-
-
-	var a_parm = args[0]
-	var b_parm = args[1]
-	var c_parm = args[2]
-
-
-	fmt.Println("  ========  curr method is setPrivate   ========== ")
-
-	fmt.Printf(" parm is  %s  %s  %s  \n " , a_parm , b_parm , c_parm )
+func (t *fabriccc) getTxID(stub shim.ChaincodeStubInterface ) pb.Response {
 
 	txid := stub.GetTxID();
 	fmt.Println("  ========  GetTxID   ==========  %s  ",txid)
@@ -510,7 +503,8 @@ func (t *fabriccc) setPrivate(stub shim.ChaincodeStubInterface, args []string) p
 
 	//stub.PutState(b_parm,[]byte(c_parm))
 
-	stub.PutPrivateData("collectionMarbles",b_parm,[]byte(c_parm));
+	stub.PutPrivateData(a_parm,b_parm,[]byte(c_parm));
+
 
 	return shim.Success( []byte( "success invok " + c_parm  )  )
 
@@ -529,7 +523,7 @@ func (t *fabriccc) getPrivate(stub shim.ChaincodeStubInterface, args []string) p
 	fmt.Printf(" parm is  %s  %s  %s   \n " , a_parm , b_parm , c_parm )
 
 	//keyvalue,err := stub.GetState(b_parm)
-	keyvalue, err := stub.GetPrivateData("collectionMarbles", b_parm)
+	keyvalue, err := stub.GetPrivateData( a_parm , b_parm )
 
 	if( err != nil  ){
 
