@@ -68,7 +68,7 @@ func (t *fabriccc) Init(stub shim.ChaincodeStubInterface) pb.Response {
 
 /**
 
-  主业务逻辑，在执行命令
+  主业务逻辑，执行命令
   peer chaincode invoke -o 192.168.23.212:7050 -C roberttestchannel -n r_test_cc6 -c '{"Args":["invoke","a","b","1"]}'
 
   的时候系统会调用该方法并传入相关的参数，注意 "invoke" 之后的参数是需要传入的参数
