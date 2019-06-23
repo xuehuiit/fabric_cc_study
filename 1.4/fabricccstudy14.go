@@ -15,7 +15,6 @@ import (
 
 
 	"fmt"
-	"github.com/hyperledger/fabric/core/chaincode/shim/ext/statebased"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
 	"github.com/golang/protobuf/proto"
@@ -28,6 +27,7 @@ import (
 	"time"
 	"encoding/gob"
 	"github.com/hyperledger/fabric/common/tools/protolator"
+	"github.com/hyperledger/fabric/core/chaincode/shim/ext/statebased"
 )
 
 
