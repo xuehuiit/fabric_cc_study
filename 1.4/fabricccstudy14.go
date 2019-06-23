@@ -252,7 +252,7 @@ func (t *fabriccc) setStateValidationParameter(stub shim.ChaincodeStubInterface,
 		return shim.Error(err.Error())
 	}
 
-	err = newEP.AddOrgs(statebased.RoleTypeMember, b_parm)
+	err = newEP.AddOrgs(statebased.RoleTypeMember, c_parm)
 
 	if err != nil {
 		return shim.Error(err.Error())
