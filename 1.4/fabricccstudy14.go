@@ -15,6 +15,7 @@ import (
 
 
 	"fmt"
+	"github.com/hyperledger/fabric/core/chaincode/shim/ext/statebased"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
 	"github.com/golang/protobuf/proto"
@@ -153,7 +154,7 @@ func (t *fabriccc) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	}else if function == "setStateValidationParameter" {
 
-		return t.setStateValidationParameter( stub )
+		return t.setStateValidationParameter( stub ,args)
 
 	}else if function == "getStateValidationParameter" {
 
@@ -229,10 +230,50 @@ func (t *fabriccc) InvokeChaincode( stub shim.ChaincodeStubInterface , args []st
 /**
   给某个key设置规则
  */
-func (t *fabriccc) setStateValidationParameter(stub shim.ChaincodeStubInterface) pb.Response {
+func (t *fabriccc) setStateValidationParameter(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 
 
-	err := stub.SetStateValidationParameter("key_org1",[]byte("OR ('Org1MSP.member','Org2MSP.member')"))
+
+
+	var a_parm = args[0]
+	var b_parm = args[1]
+	var c_parm = args[2]
+
+
+	fmt.Println("  ========  curr method is set   ========== ")
+
+	fmt.Printf(" parm is  a_parm:  %s  b_parm:  %s  c_parm: %s  \n " , a_parm , b_parm , c_parm )
+
+
+
+	newEP, err := statebased.NewStateEP(nil)
+
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = newEP.AddOrgs(statebased.RoleTypeMember, b_parm)
+
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	/*err = newEP.AddOrgs(statebased.RoleTypeMember, "Org2MSP")
+
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+*/
+	policyByte, err := newEP.Policy()
+
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+
+	fmt.Printf("the policy is   :   %s ",newEP.ListOrgs())
+
+	err = stub.SetStateValidationParameter(b_parm,policyByte)
 	if err != nil {
 		fmt.Printf("Returning error ******************\n")
 		return shim.Error(err.Error())
