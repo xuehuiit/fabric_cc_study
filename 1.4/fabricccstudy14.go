@@ -16,9 +16,8 @@ import (
 
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"github.com/hyperledger/fabric/common/attrmgr"
 	pb "github.com/hyperledger/fabric/protos/peer"
-	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric/protos/msp"
 	//"github.com/hyperledger/fabric/common/util"
 	"encoding/json"
 	//"strings"
@@ -28,6 +27,8 @@ import (
 	"encoding/gob"
 	"github.com/hyperledger/fabric/common/tools/protolator"
 	"github.com/hyperledger/fabric/core/chaincode/shim/ext/statebased"
+	"encoding/pem"
+	"crypto/x509"
 )
 
 
@@ -361,11 +362,16 @@ func (t *fabriccc) getSignedProposal(stub shim.ChaincodeStubInterface) pb.Respon
 
 /**
 获取当前方法调用者的身份信息
+
+https://jira.hyperledger.org/browse/FABC-539    //设置属性的方式
+
+https://github.com/hyperledger/fabric/blob/eca1b14b7e3453a5d32296af79cc7bad10c7673b/common/attrmgr/attrmgr_test.go  获取属性的方法
+
  */
 func (t *fabriccc) getCreator(stub shim.ChaincodeStubInterface) pb.Response {
 
 	fmt.Printf("\nBegin*** getCreator \n")
-	creator, err := stub.GetCreator()
+	/*creator, err := stub.GetCreator()
 
 	if err != nil {
 		fmt.Printf("GetCreator Error")
@@ -374,6 +380,8 @@ func (t *fabriccc) getCreator(stub shim.ChaincodeStubInterface) pb.Response {
 
 	si := &msp.SerializedIdentity{}
 	err2 := proto.Unmarshal(creator, si)
+
+	//fmt.Printf(si["id_bytes"])
 
 	if err2 != nil {
 		fmt.Printf("Proto Unmarshal Error")
@@ -384,14 +392,64 @@ func (t *fabriccc) getCreator(stub shim.ChaincodeStubInterface) pb.Response {
 	buf := &bytes.Buffer{}
 	protolator.DeepMarshalJSON(buf, si)
 	fmt.Printf("End*** getCreator \n")
-	fmt.Printf(string(buf.Bytes()))
+	fmt.Printf(string(buf.Bytes()))*/
 
 
 
 	//return shim.Success([]byte(buf.Bytes()))
 
 
+
+	creator, _ := stub.GetCreator()
+	certStart := bytes.IndexAny(creator, "-----BEGIN")
+	if certStart == -1 {
+		fmt.Errorf("No certificate found")
+	}
+	certText := creator[certStart:]
+	bl, _ := pem.Decode(certText)
+	if bl == nil {
+		fmt.Errorf("Could not decode the PEM structure")
+	}
+
+	cert, err := x509.ParseCertificate(bl.Bytes)
+	if err != nil {
+		fmt.Errorf("ParseCertificate failed")
+	}
+
+
+	uname := cert.Subject.CommonName
+	country := cert.Subject.Country
+	fmt.Println("Name:" + uname  )
+	fmt.Println(country)
+
+
+	mgr := attrmgr.New()
+	at, err := mgr.GetAttributesFromCert(cert)
+
+
+	fmt.Println(at.Names())
+
+
+	fmt.Printf("===========Name======Name=========%s", uname)
+
+	v, _, err := at.Value("test1attr")
+
+
+	if err != nil {
+		fmt.Errorf("ParseCertificate failed")
+	}
+
+	fmt.Println(" =====  attr ======  " + v)
+
 	return shim.Success(creator)
+
+
+
+
+
+
+
+
 }
 
 
