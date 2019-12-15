@@ -4,7 +4,12 @@
 
   http://www.xuehuiit.com
 
+  robbert.feng ( 老冯 )
+
   QQ 411321681
+
+  本代码配合作者撰写的Fabric实战书籍 《区块链开发实战：Hyperledger Fabric关键技术与案例分析》
+  https://item.jd.com/12380456.html
 
  */
 
@@ -74,6 +79,8 @@ func (t *fabriccc) Init(stub shim.ChaincodeStubInterface) pb.Response {
   peer chaincode invoke -o 192.168.23.212:7050 -C roberttestchannel -n r_test_cc6 -c '{"Args":["invoke","a","b","1"]}'
 
   的时候系统会调用该方法并传入相关的参数，注意 "invoke" 之后的参数是需要传入的参数
+
+
 
 */
 
@@ -297,8 +304,7 @@ func (t *fabriccc) getStateValidationParameter( stub shim.ChaincodeStubInterface
 
 	//var a_parm = args[0]
 	var b_parm = args[1]
-	//var c_parm = args[2]
-
+	//var c_parm = arg
 
 	policy , err := stub.GetStateValidationParameter(b_parm)
 	if err != nil {
